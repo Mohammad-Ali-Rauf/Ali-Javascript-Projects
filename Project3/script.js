@@ -1,79 +1,83 @@
-// Get DOM Elements
-const video = document.getElementById('video');
+const video = document.querySelector('#video');
 const play = document.getElementById('play');
 const stop = document.getElementById('stop');
 const progress = document.getElementById('progress');
-const time = document.getElementById('time');
+const timestamp = document.getElementById('timestamp');
 
-// Function to play or pause the video
-function playPauseVideo() {
-    // Check if video is paused or playing
-    if ( video.paused ) {
-        // If video is paused, play the video
+// Functions
+// 1 - toggleVideo - Play or Pause video
+// If video is playing, then pause
+// If video is paused, then play
+function toggleVideo() {
+    if (video.paused) {
         video.play();
     } else {
-        // If video is playing, pause the video
         video.pause();
     }
 };
 
-// Function to update the play / pause icons
-function updateIcons() {
-    // Check if video is paused or playing
-    if ( video.paused ) {
-        // If video is paused, show the play button
-        play.innerHTML = '<i class="fa fa-play fa-2x"></i>'
+// 2 - updateIcon - toggle between play and pause icons
+// If video is playing, then show pause icon
+// If video is paused, then show play icon
+function updateIcon() {
+    if (video.paused) {
+        play.innerHTML = '<i class="fas fa-play fa-2x"></i>';
     } else {
-        // If video is playing, show the pause button
-        play.innerHTML = '<i class="fa fa-pause fa-2x"></i>'
+        play.innerHTML = '<i class="fas fa-pause fa-2x"></i>';
     }
 };
 
-// Function to update the video progress
+// 3 - updateProgress - update the position of the progress bar and timestamp
 function updateProgress() {
-    // Update the value of progress bar using current time / total time
-    progress.value = (video.currentTime / video.duration) * 100;
-    // Use current time to calculate minutes
-    let minutes = Math.floor(video.currentTime / 60)
-    // Format minutes to always be 2 digits
-    if ( minutes < 10 ) {
-        minutes = '0' + String(minutes);
+    // Update slider
+    progress.value = video.currentTime/video.duration*100;
+
+    // Update timestamp
+    // Rounding down the minutes
+    let minutes = Math.floor(video.currentTime / 60);
+    if (minutes < 10) {
+        minutes = `0${minutes}`;
     }
-    // Use current time to calculate seconds
-    let seconds = Math.floor(video.currentTime % 60)
-    // Format seconds to always be 2 digits
-    if ( seconds < 10) {
-        seconds = '0' + String(seconds);
+
+    // Rounding down the seconds
+    let seconds = Math.floor(video.currentTime % 60);
+    if (seconds < 10) {
+        seconds = `0${seconds}`;
     }
-    // Update the time in the UI
-    time.innerHTML = `${minutes}:${seconds}`;
+    
+    // Display Timestamp
+    timestamp.innerHTML = `${minutes}:${seconds}`;
 };
 
-// Function to stop video playback
+// 4 - stopVideo - Stop video playback and reset time to 0
 function stopVideo() {
-    // Reset the video time to 0
-    video.currentTime = 0;
     video.pause();
+    video.currentTime = 0;
 };
 
-// Function to update the videos progress based on progress bar change
-function updateVideoProgress() {
-    // Set the current time of video based on position of slider
-    video.currentTime = (progress.value * video.duration) / 100;
+// 5 - setProgress - update video playback time based on manual change in progress bar
+function setProgress() {
+    video.currentTime = progress.value * video.duration / 100;
 };
 
 // Event Listeners
-// 1. Listen for click on video element
-video.addEventListener('click', playPauseVideo);
-// 2. Listen for pause event on video element
-video.addEventListener('pause', updateIcons);
-// 3. Listen for play event on video element
-video.addEventListener('play', updateIcons);
-// 4. Listen for timeupdate event on video element
+// 1 - Video Element - click to play or pause video
+video.addEventListener('click', toggleVideo);
+
+// 2 - Video Element - pause to toggle play icon to pause icon
+video.addEventListener('pause', updateIcon);
+
+// 3 - Video Element - play to toggle pause icon back to play icon
+video.addEventListener('play', updateIcon);
+
+// 4 - Video Element - update progress bar and timestamp
 video.addEventListener('timeupdate', updateProgress);
-// 5. Listen for click event on play button
-play.addEventListener('click', playPauseVideo);
-// 6. Listen for click event on stop button
+
+// 5 - Play Button - click to play or pause video
+play.addEventListener('click', toggleVideo);
+
+// 6 - Stop Button - click to reset video and pause video
 stop.addEventListener('click', stopVideo);
-// 7. Listen for change event on progress bar
-progress.addEventListener('change', updateVideoProgress);
+
+// 7 - Progress Bar - change position to change time of playback
+progress.addEventListener('change', setProgress);
